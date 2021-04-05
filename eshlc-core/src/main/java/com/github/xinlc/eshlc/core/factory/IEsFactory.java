@@ -2,6 +2,8 @@ package com.github.xinlc.eshlc.core.factory;
 
 import com.github.xinlc.eshlc.core.domain.EsDocument;
 import com.github.xinlc.eshlc.core.domain.IndexProperties;
+import com.github.xinlc.eshlc.core.server.AbstractQuery;
+import com.github.xinlc.eshlc.core.server.EsQueryBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -35,6 +37,20 @@ public interface IEsFactory {
      * @param client ES客户端
      */
     void setClient(RestHighLevelClient client);
+
+    /**
+     * 获取查询构造器
+     *
+     * @return ES SearchBuilder
+     */
+    EsQueryBuilder getBuilder();
+
+    /**
+     * 获取ES查询实现类
+     *
+     * @return AbstractESQuery
+     */
+    AbstractQuery getQuery();
 
     /**
      * 获取客户端

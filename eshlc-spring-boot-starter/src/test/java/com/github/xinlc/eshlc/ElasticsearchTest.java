@@ -4,9 +4,15 @@ import com.github.xinlc.eshlc.core.ElasticsearchTemplate;
 import com.github.xinlc.eshlc.core.annotation.EsID;
 import com.github.xinlc.eshlc.core.annotation.EsTable;
 import com.github.xinlc.eshlc.core.domain.*;
+import com.github.xinlc.eshlc.core.enums.OperatorType;
 import com.github.xinlc.eshlc.core.enums.OrderType;
 import com.github.xinlc.eshlc.core.factory.EsFramework;
 import com.github.xinlc.eshlc.core.factory.IEsFactory;
+import com.github.xinlc.eshlc.core.server.DefaultQuery;
+import com.github.xinlc.eshlc.core.server.EsQueryBuilder;
+import com.github.xinlc.eshlc.core.server.IEsQueryAware;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,9 +85,9 @@ public class ElasticsearchTest {
     @Test
     public void testDoc() {
         List<DocFoo> docAS = new ArrayList<>();
-        docAS.add(new DocFoo(null, "Richard1"));
-        docAS.add(new DocFoo(null, "Richard2"));
-        docAS.add(new DocFoo("3", "Richard3"));
+        docAS.add(new DocFoo(null, "Richard1", 25));
+        docAS.add(new DocFoo(null, "Richard2", 30));
+        docAS.add(new DocFoo("3", "Richard3", 40));
 
         // 批量
         List<EsBatchResponse> batchResponses = elasticsearchTemplate.saveBatch(docAS);
@@ -107,16 +114,44 @@ public class ElasticsearchTest {
 //        elasticsearchTemplate.search();
     }
 
+    /**
+     * 测试查询
+     */
+    @Test
+    public void testQuery() throws IOException {
+        IEsFactory esFactory = esFramework.getFactory("es1");
+        String indexName = "test_index";
+
+        RestHighLevelClient client = esFactory.getClient();
+        logger.info("打印信息{}", client.info(RequestOptions.DEFAULT));
+
+        EsQueryBuilder builder = new EsQueryBuilder();
+        builder.indexNames(indexName);
+        builder.addCondition("age", OperatorType.EQUALS, 25)
+            .or()
+            .addCondition("age", OperatorType.EQUALS, 30);
+
+        IEsQueryAware query = new DefaultQuery(client).query(builder.getQueryContext());
+        IEsPage<DocFoo> testList = query.page(DocFoo.class);
+        
+        logger.info("查询到的总数：{}", testList.getTotal());
+    }
+
 
     @EsTable(index = "test_index")
     static class DocFoo {
         @EsID
         private String id;
         private String name;
+        private Integer age;
 
-        public DocFoo(String id, String name) {
+        public DocFoo() {
+        }
+
+        public DocFoo(String id, String name, Integer age) {
             this.id = id;
             this.name = name;
+            this.age = age;
         }
 
         public String getId() {
@@ -135,12 +170,12 @@ public class ElasticsearchTest {
             this.name = name;
         }
 
-        @Override
-        public String toString() {
-            return "DocFoo{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+        public Integer getAge() {
+            return age;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
         }
     }
 }

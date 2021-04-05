@@ -4,6 +4,9 @@ import cn.hutool.core.date.SystemClock;
 import cn.hutool.core.util.StrUtil;
 import com.github.xinlc.eshlc.core.domain.EsDocument;
 import com.github.xinlc.eshlc.core.domain.IndexProperties;
+import com.github.xinlc.eshlc.core.server.AbstractQuery;
+import com.github.xinlc.eshlc.core.server.DefaultQuery;
+import com.github.xinlc.eshlc.core.server.EsQueryBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -48,6 +51,16 @@ public class EsFactory implements IEsFactory {
     @Override
     public void setClient(RestHighLevelClient client) {
         this.client = client;
+    }
+
+    @Override
+    public EsQueryBuilder getBuilder() {
+        return new EsQueryBuilder();
+    }
+
+    @Override
+    public AbstractQuery getQuery() {
+        return new DefaultQuery(this.client);
     }
 
     @Override
