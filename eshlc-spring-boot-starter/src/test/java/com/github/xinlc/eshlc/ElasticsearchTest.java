@@ -133,7 +133,7 @@ public class ElasticsearchTest {
 
         IEsQueryAware query = new DefaultQuery(client).query(builder.getQueryContext());
         IEsPage<DocFoo> testList = query.page(DocFoo.class);
-        
+
         logger.info("查询到的总数：{}", testList.getTotal());
     }
 

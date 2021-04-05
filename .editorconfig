@@ -1,0 +1,57 @@
+# http://editorconfig.org
+root = true
+
+# 对所有文件生效
+[*]
+# 缩进风格，可选space、tab
+indent_style = space
+# 缩进大小4
+indent_size = 4
+# 结尾换行符，可选lf、cr、crlf
+end_of_line = lf
+# 字符集utf-8
+charset = utf-8
+# 是否删除行尾的空格
+trim_trailing_whitespace = true
+# 是否在文件的最后插入一个空行
+insert_final_newline = true
+
+# 对java文件生效
+# [*.java]
+# 遵循阿里巴巴规范，禁止使用 tab 字符缩进
+# indent_style = tab
+# indent_size = 4
+
+# 对json,yml文件生效
+# [*.{json,yml}]
+# indent_size = 2
+
+# 对后缀名为 .md 的文件生效
+[*.md]
+indent_size = 2
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[{*.ng,*.sht,*.html,*.shtm,*.shtml,*.htm}]
+indent_size = 2
+
+[{*.jhm,*.xslt,*.xul,*.rng,*.xsl,*.xsd,*.ant,*.tld,*.fxml,*.jrxml,*.jnlp,*.wsdl}]
+indent_size = 2
+
+[{.babelrc,.stylelintrc,jest.config,.eslintrc,.prettierrc,*.json,*.jsb3,*.jsb2,*.bowerrc}]
+indent_size = 2
+
+[*.svg]
+indent_size = 2
+
+[*.js.map]
+indent_size = 2
+
+[*.less]
+indent_size = 2
+
+[*.vue]
+indent_size = 2
+
+[{.analysis_options,*.yml,*.yaml}]
+indent_size = 2
