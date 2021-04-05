@@ -1,0 +1,12 @@
+elasticsearch:
+  clusters:
+    es1:
+      defaultClient: true
+      hosts: 127.0.0.1
+      ports: 9200
+      username: elastic
+      password: elastic
+
+logging:
+  level:
+    com.github.xinlc.eshlc: debug
