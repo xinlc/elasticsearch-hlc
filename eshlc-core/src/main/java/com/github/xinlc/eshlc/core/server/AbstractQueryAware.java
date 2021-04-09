@@ -113,19 +113,12 @@ public abstract class AbstractQueryAware implements IEsQueryAware {
         EsSort sort = queryContext.getSort();
         List<SortBuilder<?>> sorts = new ArrayList<>();
 
-        // 添加默认打分排序
-        sorts.add(SortBuilders.scoreSort().order(SortOrder.DESC));
-
         if (sort == null) {
             return sorts;
         }
 
         // 添加业务端排序
-        sort.getOrders().forEach(o -> {
-            FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(o.getFieldName())
-                .order(o.getOrderType() == OrderType.ASC ? SortOrder.ASC : SortOrder.DESC);
-            sorts.add(fieldSortBuilder);
-        });
+        sort.getOrders().forEach(o -> sorts.add(o.toSortBuilder()));
 
         return sorts;
     }

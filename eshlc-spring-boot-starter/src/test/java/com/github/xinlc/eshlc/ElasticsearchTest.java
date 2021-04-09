@@ -100,9 +100,12 @@ public class ElasticsearchTest {
     @Test
     public void testSearch() {
         EsPageSortHighLight psh = new EsPageSortHighLight(1, 10);
-        EsSort.Order order = new EsSort.Order("id", OrderType.DESC);
-        EsSort.Order order1 = new EsSort.Order("time", OrderType.ASC);
-        psh.setSort(new EsSort(order, order1));
+
+//        EsSimpleSort.Order order = new EsSimpleSort.Order("id", OrderType.DESC);
+//        EsSimpleSort.Order order1 = new EsSimpleSort.Order("time", OrderType.ASC);
+//        psh.setSort(new EsSimpleSort(order, order1));
+
+        psh.setSort(new EsSort(IEsSort.fieldAsc("id"), IEsSort.scoreDesc()));
         psh.setHighLight(new EsHighLight().field("name"));
 
         // 首页从1开始
@@ -126,10 +129,17 @@ public class ElasticsearchTest {
         logger.info("打印信息{}", client.info(RequestOptions.DEFAULT));
 
         EsQueryBuilder builder = new EsQueryBuilder();
+
         builder.indexNames(indexName);
+
+        // 添加条件
         builder.addCondition("age", OperatorType.EQUALS, 25)
             .or()
             .addCondition("age", OperatorType.EQUALS, 30);
+
+        // 添加排序
+        builder.order(IEsSort.scoreDesc());
+        builder.order(IEsSort.fieldAsc("age"));
 
         IEsQueryAware query = new DefaultQuery(client).query(builder.getQueryContext());
         IEsPage<DocFoo> testList = query.page(DocFoo.class);

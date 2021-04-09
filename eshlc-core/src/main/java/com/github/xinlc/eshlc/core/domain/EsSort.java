@@ -1,7 +1,5 @@
 package com.github.xinlc.eshlc.core.domain;
 
-import com.github.xinlc.eshlc.core.enums.OrderType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,22 +8,22 @@ import java.util.List;
  * ES 排序
  *
  * @author Richard
- * @since 2021-04-01
+ * @since 2021-04-05
  */
 public class EsSort {
 
-    private List<Order> orders;
+    private List<IEsSort> orders;
 
     public EsSort() {
         orders = new ArrayList<>();
     }
 
-    public EsSort(Order... ods) {
+    public EsSort(IEsSort... ods) {
         orders = new ArrayList<>();
         orders.addAll(Arrays.asList(ods));
     }
 
-    public EsSort sort(Order order) {
+    public EsSort sort(IEsSort order) {
         if (orders == null) {
             orders = new ArrayList<>();
         }
@@ -41,48 +39,12 @@ public class EsSort {
         return this;
     }
 
-    public List<Order> getOrders() {
+    public List<IEsSort> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Order> orders) {
+    public void setOrders(List<IEsSort> orders) {
         this.orders = orders;
     }
 
-    public static class Order {
-        private String fieldName;
-        private OrderType orderType;
-
-        public Order() {
-        }
-
-        public Order(String fieldName, OrderType orderType) {
-            this.fieldName = fieldName;
-            this.orderType = orderType;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public void setFieldName(String fieldName) {
-            this.fieldName = fieldName;
-        }
-
-        public OrderType getOrderType() {
-            return orderType;
-        }
-
-        public void setOrderType(OrderType orderType) {
-            this.orderType = orderType;
-        }
-
-        @Override
-        public String toString() {
-            return "Order{" +
-                "fieldName='" + fieldName + '\'' +
-                ", orderType=" + orderType +
-                '}';
-        }
-    }
 }

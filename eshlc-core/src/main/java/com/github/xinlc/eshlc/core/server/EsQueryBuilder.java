@@ -1,9 +1,6 @@
 package com.github.xinlc.eshlc.core.server;
 
-import com.github.xinlc.eshlc.core.domain.EsOperatorContext;
-import com.github.xinlc.eshlc.core.domain.EsQueryContext;
-import com.github.xinlc.eshlc.core.domain.EsSort;
-import com.github.xinlc.eshlc.core.domain.IEsPageable;
+import com.github.xinlc.eshlc.core.domain.*;
 import com.github.xinlc.eshlc.core.enums.OperatorType;
 import com.github.xinlc.eshlc.core.enums.OrderType;
 import com.github.xinlc.eshlc.core.enums.QueryLogicType;
@@ -137,12 +134,11 @@ public class EsQueryBuilder {
     /**
      * 排序
      *
-     * @param field     字段
-     * @param orderType 排序类型
+     * @param sort 排序
      * @return 查询构造器
      */
-    public EsQueryBuilder order(String field, OrderType orderType) {
-        this.queryContext.getSort().sort(new EsSort.Order(field, orderType));
+    public EsQueryBuilder order(IEsSort sort) {
+        this.queryContext.getSort().sort(sort);
         return this;
     }
 
