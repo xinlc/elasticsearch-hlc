@@ -77,6 +77,11 @@ public class EsInfo {
         private Integer maxConnectPerRoute = 10;
 
         /**
+         * Keep Alive 单位秒，默认 org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy
+         */
+        private Integer keepAliveDuration = null;
+
+        /**
          * 认证用户
          */
         private String username;
@@ -166,6 +171,14 @@ public class EsInfo {
             this.maxConnectPerRoute = maxConnectPerRoute;
         }
 
+        public Integer getKeepAliveDuration() {
+            return keepAliveDuration;
+        }
+
+        public void setKeepAliveDuration(Integer keepAliveDuration) {
+            this.keepAliveDuration = keepAliveDuration;
+        }
+
         public String getUsername() {
             return username;
         }
@@ -195,6 +208,9 @@ public class EsInfo {
                 ", socketTimeout=" + socketTimeout +
                 ", maxConnectTotal=" + maxConnectTotal +
                 ", maxConnectPerRoute=" + maxConnectPerRoute +
+                ", keepAliveDuration=" + keepAliveDuration +
+                ", username='" + username + '\'' +
+                ", password='" + "******" + '\'' +
                 '}';
         }
     }
