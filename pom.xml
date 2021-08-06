@@ -181,6 +181,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${maven.source.version}</version>
+                    <configuration>
+                        <source>${java.source.version}</source>
+                        <target>${java.target.version}</target>
+                        <encoding>${java.encoding}</encoding>
+                    </configuration>
                     <executions>
                         <execution>
                             <phase>package</phase>
