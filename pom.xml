@@ -43,6 +43,7 @@
 
     <properties>
         <!-- Build -->
+        <skipTests>true</skipTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
         <java.source.version>1.8</java.source.version>
