@@ -22,7 +22,7 @@ jobs:
       - name: Set up Maven Central Repo
         uses: actions/setup-java@v2
         with:
-          java-version: '1.8'
+          java-version: '8.0'
           distribution: 'adopt'
           server-id: sonatype-nexus-staging
           settings-path: ${{ github.workspace }} # location for the settings.xml file
