@@ -4,11 +4,21 @@ import cn.hutool.core.date.SystemClock;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.github.xinlc.eshlc.core.domain.EsInfo;
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.annotation.Contract;
+import org.apache.http.annotation.ThreadingBehavior;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.message.BasicHeaderElementIterator;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.Args;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -17,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * ES 框架
@@ -161,6 +172,9 @@ public class EsFramework {
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             httpClientBuilder.setMaxConnTotal(cluster.getMaxConnectTotal());
             httpClientBuilder.setMaxConnPerRoute(cluster.getMaxConnectPerRoute());
+            if (null != cluster.getKeepAliveDuration()) {
+                httpClientBuilder.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy(TimeUnit.SECONDS.toMillis(cluster.getKeepAliveDuration())));
+            }
             if (null != finalCredentialsProvider) {
                 httpClientBuilder.setDefaultCredentialsProvider(finalCredentialsProvider);
             }
@@ -186,6 +200,42 @@ public class EsFramework {
         }
 
         return httpHosts;
+    }
+
+    /**
+     * 重写KeepAlive默认策略，指定默认最大存活时间
+     *
+     * @see org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy
+     */
+    @Contract(threading = ThreadingBehavior.IMMUTABLE)
+    static class DefaultConnectionKeepAliveStrategy implements ConnectionKeepAliveStrategy {
+
+        // 最大存活时间，毫秒
+        private final long maxKeepAlive;
+
+        DefaultConnectionKeepAliveStrategy(long maxKeepAlive) {
+            this.maxKeepAlive = maxKeepAlive;
+        }
+
+        @Override
+        public long getKeepAliveDuration(final HttpResponse response, final HttpContext context) {
+            Args.notNull(response, "HTTP response");
+            final HeaderElementIterator it = new BasicHeaderElementIterator(
+                response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+            while (it.hasNext()) {
+                final HeaderElement he = it.nextElement();
+                final String param = he.getName();
+                final String value = he.getValue();
+                if (value != null && param.equalsIgnoreCase("timeout")) {
+                    try {
+                        return Long.parseLong(value) * 1000;
+                    } catch (final NumberFormatException ignore) {
+                    }
+                }
+            }
+            // 指定默认时间
+            return this.maxKeepAlive;
+        }
     }
 
 }
