@@ -90,8 +90,8 @@ public abstract class AbstractQueryAware implements IEsQueryAware {
             return highlightBuilder;
         }
 
-        // 如果要多个字段高亮,这项要为 false
-        highlightBuilder.requireFieldMatch(false)
+        // 如果要多个字段匹配高亮, requireFieldMatch 这项要设置为 false
+        highlightBuilder.requireFieldMatch(Boolean.TRUE)
             .numOfFragments(0)
             .preTags(highLight.getPreTag())
             .postTags(highLight.getPostTag())
