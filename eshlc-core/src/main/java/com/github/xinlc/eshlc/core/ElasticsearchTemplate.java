@@ -83,6 +83,36 @@ public class ElasticsearchTemplate extends AbstractElasticsearchTemplate {
     }
 
     @Override
+    public <T> List<EsBatchResponse> updateBatch(List<T> list) throws EsException {
+        return documentOperations.updateBatch(list);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> updateBatch(List<T> list, int batchSize) throws EsException {
+        return documentOperations.updateBatch(list, batchSize);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> deleteBatch(List<T> list) throws EsException {
+        return documentOperations.deleteBatch(list);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> deleteBatch(List<T> list, int batchSize) throws EsException {
+        return documentOperations.deleteBatch(list, batchSize);
+    }
+
+    @Override
+    public List<EsBatchResponse> deleteBatch(String index, List<String> ids) throws EsException {
+        return documentOperations.deleteBatch(index, ids);
+    }
+
+    @Override
+    public List<EsBatchResponse> deleteBatch(String index, List<String> ids, int batchSize) throws EsException {
+        return documentOperations.deleteBatch(index, ids, batchSize);
+    }
+
+    @Override
     public SearchResponse search(SearchRequest searchRequest) throws EsException {
         return searchOperations.search(searchRequest);
     }

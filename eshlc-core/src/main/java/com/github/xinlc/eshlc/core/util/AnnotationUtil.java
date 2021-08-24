@@ -1,5 +1,6 @@
 package com.github.xinlc.eshlc.core.util;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.github.xinlc.eshlc.core.annotation.EsID;
 import com.github.xinlc.eshlc.core.annotation.EsTable;
 
@@ -39,7 +40,7 @@ public final class AnnotationUtil {
      * @return ES文档ID
      */
     public static String getEsId(Object obj) {
-        Field[] fields = obj.getClass().getDeclaredFields();
+        Field[] fields = ReflectUtil.getFields(obj.getClass());
         for (Field f : fields) {
             f.setAccessible(true);
             EsID esid = f.getAnnotation(EsID.class);
