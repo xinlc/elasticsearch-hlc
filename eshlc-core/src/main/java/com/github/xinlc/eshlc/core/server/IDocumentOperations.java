@@ -151,4 +151,75 @@ public interface IDocumentOperations {
      */
     <T> List<EsBatchResponse> saveBatch(List<T> list, int batchSize) throws EsException;
 
+    /**
+     * 批量更新文档
+     * <p>
+     * 会解析 @EsTable 标识的实体
+     *
+     * @param list 更新的数据
+     * @param <T>  文档数据类型
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    <T> List<EsBatchResponse> updateBatch(List<T> list) throws EsException;
+
+    /**
+     * 批量更新文档
+     * <p>
+     * 会解析 @EsTable 标识的实体
+     *
+     * @param list      更新的数据
+     * @param batchSize 批次数量
+     * @param <T>       文档数据类型
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    <T> List<EsBatchResponse> updateBatch(List<T> list, int batchSize) throws EsException;
+
+    /**
+     * 批量删除文档
+     * <p>
+     * 会解析 @EsTable 标识的实体
+     *
+     * @param list 删除的数据
+     * @param <T>  文档数据类型
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    <T> List<EsBatchResponse> deleteBatch(List<T> list) throws EsException;
+
+    /**
+     * 批量删除文档
+     * <p>
+     * 会解析 @EsTable 标识的实体
+     *
+     * @param list      删除的数据
+     * @param batchSize 批次数量
+     * @param <T>       文档数据类型
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    <T> List<EsBatchResponse> deleteBatch(List<T> list, int batchSize) throws EsException;
+
+    /**
+     * 批量删除文档
+     *
+     * @param index 索引名称
+     * @param ids   文档ID集合
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    List<EsBatchResponse> deleteBatch(String index, List<String> ids) throws EsException;
+
+    /**
+     * 批量删除文档
+     *
+     * @param index     索引名称
+     * @param ids       文档ID集合
+     * @param batchSize 批次数量
+     * @return 批处理结果
+     * @throws EsException ES异常
+     */
+    List<EsBatchResponse> deleteBatch(String index, List<String> ids, int batchSize) throws EsException;
+
 }

@@ -148,22 +148,53 @@ public class DefaultDocumentOperations extends AbstractOperations implements IDo
 
     @Override
     public <T> List<EsBatchResponse> saveBatch(List<T> list, int batchSize) throws EsException {
-        List<EsDocument> documentList = new ArrayList<>();
-        for (T t : list) {
-            String esIndex = AnnotationUtil.getEsIndex(t);
-            String esId = AnnotationUtil.getEsId(t);
+        List<EsDocument> documentList = toEsDocumentList(list);
 
-            Assert.notEmpty(esIndex, "ElasticSearch index name cannot empty.");
-
-            EsDocument esDocument = new EsDocument();
-            esDocument.setIndex(esIndex);
-            esDocument.setId(esId);
-            esDocument.setJsonData(JsonUtil.toJson(t));
-            documentList.add(esDocument);
-        }
-
-        // 批量保存
         return saveBatches(documentList, batchSize);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> updateBatch(List<T> list) throws EsException {
+        return this.updateBatch(list, EsConstant.BULK_SIZE);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> updateBatch(List<T> list, int batchSize) throws EsException {
+        List<EsDocument> documentList = toEsDocumentList(list);
+
+        return updateBatches(documentList, batchSize);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> deleteBatch(List<T> list) throws EsException {
+        return this.deleteBatch(list, EsConstant.BULK_SIZE);
+    }
+
+    @Override
+    public <T> List<EsBatchResponse> deleteBatch(List<T> list, int batchSize) throws EsException {
+        List<EsDocument> documentList = toEsDocumentList(list);
+
+        return deleteBatches(documentList, batchSize);
+    }
+
+    @Override
+    public List<EsBatchResponse> deleteBatch(String index, List<String> ids) throws EsException {
+        return deleteBatch(index, ids, EsConstant.BULK_SIZE);
+    }
+
+    @Override
+    public List<EsBatchResponse> deleteBatch(String index, List<String> ids, int batchSize) throws EsException {
+
+        List<EsDocument> documentList = ids.stream()
+            .map(id -> {
+                EsDocument esDocument = new EsDocument();
+                esDocument.setIndex(index);
+                esDocument.setId(id);
+                return esDocument;
+            })
+            .collect(Collectors.toList());
+
+        return deleteBatches(documentList, batchSize);
     }
 
     /**
@@ -207,6 +238,86 @@ public class DefaultDocumentOperations extends AbstractOperations implements IDo
     }
 
     /**
+     * 批量更新
+     *
+     * @param documentList 文档集合
+     * @param batchSize    批次数量
+     * @return 批处理结果
+     */
+    private List<EsBatchResponse> updateBatches(List<EsDocument> documentList, int batchSize) {
+        // 分割集合
+        List<List<EsDocument>> lists = EsTools.splitList(documentList, batchSize, true);
+        BulkResponse[] bulkResponses = new BulkResponse[lists.size()];
+
+        EsTools.forEach(lists, (i, n) -> bulkResponses[i] = updateBatchPart(n));
+
+        // 处理结果
+        return mapBulkResponse(bulkResponses);
+    }
+
+    /**
+     * 分批更新
+     *
+     * @param documentList 文档集合
+     * @return 响应
+     */
+    private BulkResponse updateBatchPart(List<EsDocument> documentList) {
+        BulkResponse response;
+
+        try {
+            response = esFactory.bulkUpdate(documentList);
+        } catch (IOException e) {
+            logger.debug("save batch failed：", e);
+
+            // 这一批都失败，赋空值，由上游处理
+            BulkItemResponse[] bulkItemResponses = new BulkItemResponse[documentList.size()];
+            response = new BulkResponse(bulkItemResponses, 0L);
+        }
+
+        return response;
+    }
+
+    /**
+     * 批量删除
+     *
+     * @param documentList 文档集合
+     * @param batchSize    批次数量
+     * @return 批处理结果
+     */
+    private List<EsBatchResponse> deleteBatches(List<EsDocument> documentList, int batchSize) {
+        // 分割集合
+        List<List<EsDocument>> lists = EsTools.splitList(documentList, batchSize, true);
+        BulkResponse[] bulkResponses = new BulkResponse[lists.size()];
+
+        EsTools.forEach(lists, (i, n) -> bulkResponses[i] = deleteBatchPart(n));
+
+        // 处理结果
+        return mapBulkResponse(bulkResponses);
+    }
+
+    /**
+     * 分批删除
+     *
+     * @param documentList 文档集合
+     * @return 响应
+     */
+    private BulkResponse deleteBatchPart(List<EsDocument> documentList) {
+        BulkResponse response;
+
+        try {
+            response = esFactory.bulkDelete(documentList);
+        } catch (IOException e) {
+            logger.debug("save batch failed：", e);
+
+            // 这一批都失败，赋空值，由上游处理
+            BulkItemResponse[] bulkItemResponses = new BulkItemResponse[documentList.size()];
+            response = new BulkResponse(bulkItemResponses, 0L);
+        }
+
+        return response;
+    }
+
+    /**
      * 处理Bulk结果
      *
      * @param bulkResponses Bulk响应
@@ -236,4 +347,30 @@ public class DefaultDocumentOperations extends AbstractOperations implements IDo
 
         return batchResponses;
     }
+
+    /**
+     * 转为ES 文档
+     *
+     * @param list 文档对象
+     * @param <T>  对象类型
+     * @return ES 文档集合
+     */
+    private <T> List<EsDocument> toEsDocumentList(List<T> list) {
+        List<EsDocument> documentList = new ArrayList<>();
+        for (T t : list) {
+            String esIndex = AnnotationUtil.getEsIndex(t);
+            String esId = AnnotationUtil.getEsId(t);
+
+            Assert.notEmpty(esIndex, "ElasticSearch index name cannot empty.");
+
+            EsDocument esDocument = new EsDocument();
+            esDocument.setIndex(esIndex);
+            esDocument.setId(esId);
+            esDocument.setJsonData(JsonUtil.toJson(t));
+            documentList.add(esDocument);
+        }
+
+        return documentList;
+    }
+
 }
