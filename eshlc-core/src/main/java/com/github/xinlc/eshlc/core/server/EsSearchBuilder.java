@@ -2,6 +2,7 @@ package com.github.xinlc.eshlc.core.server;
 
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
@@ -387,4 +388,106 @@ public class EsSearchBuilder {
     public BoolQueryBuilder buildQuery() {
         return this.boolQueryBuilder;
     }
+
+    /*
+     * =================
+     * 原生方法
+     * =================
+     */
+
+    /**
+     * Adds a query that <b>must</b> appear in the matching documents and will
+     * contribute to scoring. No {@code null} value allowed.
+     */
+    public EsSearchBuilder must(QueryBuilder queryBuilder) {
+        this.boolQueryBuilder.must(queryBuilder);
+        return this;
+    }
+
+    public EsSearchBuilder must(boolean condition, QueryBuilder queryBuilder) {
+        if (condition) {
+            return must(queryBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Adds a query that <b>must</b> appear in the matching documents but will
+     * not contribute to scoring. No {@code null} value allowed.
+     */
+    public EsSearchBuilder filter(QueryBuilder queryBuilder) {
+        this.boolQueryBuilder.filter(queryBuilder);
+        return this;
+    }
+
+    public EsSearchBuilder filter(boolean condition, QueryBuilder queryBuilder) {
+        if (condition) {
+            return filter(queryBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Adds a query that <b>must not</b> appear in the matching documents.
+     * No {@code null} value allowed.
+     */
+    public EsSearchBuilder mustNot(QueryBuilder queryBuilder) {
+        this.boolQueryBuilder.mustNot(queryBuilder);
+        return this;
+    }
+
+    public EsSearchBuilder mustNot(boolean condition, QueryBuilder queryBuilder) {
+        if (condition) {
+            return mustNot(queryBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Adds a clause that <i>should</i> be matched by the returned documents. For a boolean query with no
+     * {@code MUST} clauses one or more <code>SHOULD</code> clauses must match a document
+     * for the BooleanQuery to match. No {@code null} value allowed.
+     *
+     * @see #minimumShouldMatch(int)
+     */
+    public EsSearchBuilder should(QueryBuilder queryBuilder) {
+        this.boolQueryBuilder.should(queryBuilder);
+        return this;
+    }
+
+    public EsSearchBuilder should(boolean condition, QueryBuilder queryBuilder) {
+        if (condition) {
+            return should(queryBuilder);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the minimum should match parameter using the special syntax (for example, supporting percentage).
+     *
+     * @see BoolQueryBuilder#minimumShouldMatch(int)
+     */
+    public EsSearchBuilder minimumShouldMatch(String minimumShouldMatch) {
+        this.boolQueryBuilder.minimumShouldMatch(minimumShouldMatch);
+        return this;
+    }
+
+    /**
+     * Specifies a minimum number of the optional (should) boolean clauses which must be satisfied.
+     * <p>
+     * By default no optional clauses are necessary for a match
+     * (unless there are no required clauses).  If this method is used,
+     * then the specified number of clauses is required.
+     * <p>
+     * Use of this method is totally independent of specifying that
+     * any specific clauses are required (or prohibited).  This number will
+     * only be compared against the number of matching optional clauses.
+     *
+     * @param minimumShouldMatch the number of optional clauses that must match
+     */
+    public EsSearchBuilder minimumShouldMatch(int minimumShouldMatch) {
+        this.boolQueryBuilder.minimumShouldMatch(minimumShouldMatch);
+        return this;
+    }
+    
 }
